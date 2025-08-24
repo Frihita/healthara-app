@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mental Wellness Quiz | Healthara</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-100 to-pink-100 min-h-screen">
+
+  <div class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="max-w-xl w-full bg-white/80 rounded-2xl shadow-xl p-6">
+      <div class="flex items-center gap-3 mb-6">
+        <button onclick="window.history.back()" class="rounded-full p-2 hover:bg-gray-200">
+          <!-- ArrowLeft SVG -->
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h1 class="text-2xl font-bold text-gray-900">Mental Wellness Quiz</h1>
+      </div>
+      <div id="quiz-progress" class="mb-4">
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div id="progress-bar" class="bg-purple-500 h-2 rounded-full transition-all" style="width:0%"></div>
+        </div>
+        <div class="text-right text-xs mt-1 text-gray-500" id="progress-label"></div>
+      </div>
+      <form id="quiz-form" class="space-y-6">
+        <!-- JS will inject questions here -->
+      </form>
+      <div id="quiz-nav" class="flex justify-between mt-6">
+        <button id="prev-btn" type="button" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold" disabled>Back</button>
+        <button id="next-btn" type="button" class="px-4 py-2 rounded-lg bg-purple-600 text-white font-semibold">Next</button>
+      </div>
+      <div id="quiz-result" class="hidden mt-8"></div>
+    </div>
+  </div>
+
+  <script>
+    // Quiz questions
+    const questions = [
+      {
+        id: 'current_mood',
+        question: 'How would you describe your current mood most of the time?',
+        options: [
+          { value: 'happy', label: 'Happy/Content' },
+          { value: 'neutral', label: 'Neutral' },
+          { value: 'sad', label: 'Sad/Low' },
+          { value: 'anxious', label: 'Anxious' }
+        ]
+      },
+      {
+        id: 'overwhelmed',
+        question: 'How often do you feel overwhelmed by daily tasks or responsibilities?',
+        options: [
+          { value: 'rarely', label: 'Rarely' },
+          { value: 'occasionally', label: 'Occasionally' },
+          { value: 'often', label: 'Often' },
+          { value: 'almost_always', label: 'Almost always' }
+        ]
+      },
+      {
+        id: 'sleep_quality',
+        question: 'How well are you sleeping these days?',
+        options: [
+          { value: 'very_well', label: 'Very well' },
+          { value: 'fairly_well', label: 'Fairly well' },
+          { value: 'poorly', label: 'Poorly' },
+          { value: 'hardly', label: 'Hardly sleeping' }
+        ]
+      },
+      {
+        id: 'irritability',
+        question: 'How often do you feel irritable, angry, or frustrated without a clear reason?',
+        options: [
+          { value: 'rarely', label: 'Rarely' },
+          { value: 'sometimes', label: 'Sometimes' },
+          { value: 'often', label: 'Often' },
+          { value: 'almost_always', label: 'Almost always' }
+        ]
+      },
+      {
+        id: 'sadness',
+        question: 'Have you been feeling unusually sad, empty, or hopeless lately?',
+        options: [
+          { value: 'no', label: 'No' },
+          { value: 'sometimes', label: 'Sometimes' },
+          { value: 'frequently', label: 'Frequently' }
+        ]
+      },
+      {
+        id: 'concentration',
+        question: 'Do you find it hard to concentrate or make decisions?',
+        options: [
+          { value: 'no', label: 'No' },
+          { value: 'sometimes', label: 'Sometimes' },
+          { value: 'frequently', label: 'Frequently' }
+        ]
+      },
+      {
+        id: 'social_connection',
+        question: 'How connected do you feel to family and friends?',
+        options: [
+          { value: 'very_connected', label: 'Very connected' },
+          { value: 'somewhat_connected', label: 'Somewhat connected' },
+          { value: 'rarely_connected', label: 'Rarely connected' },
+          { value: 'not_connected', label: 'Not at all' }
+        ]
+      },
+      {
+        id: 'anxiety_worry',
+        question: 'Do you feel anxious or worried most of the day?',
+        options: [
+          { value: 'no', label: 'No' },
+          { value: 'sometimes', label: 'Sometimes' },
+          { value: 'frequently', label: 'Frequently' },
+          { value: 'constantly', label: 'Almost constantly' }
+        ]
+      },
+      {
+        id: 'self_confidence',
+        question: 'Do you feel confident about yourself and your future?',
+        options: [
+          { value: 'yes', label: 'Yes' },
+          { value: 'unsure', label: 'Unsure' },
+          { value: 'no', label: 'No' }
+        ]
+      },
+      {
+        id: 'support_system',
+        question: 'Do you have someone you can talk to when you feel low or stressed?',
+        options: [
+          { value: 'always', label: 'Yes, always' },
+          { value: 'sometimes', label: 'Sometimes' },
+          { value: 'rarely', label: 'Rarely' },
+          { value: 'no', label: 'No' }
+        ]
+      }
+    ];
+
+    let currentQuestion = 0;
+    let answers = {};
+
+    function renderQuestion() {
+      const q = questions[currentQuestion];
+      const form = document.getElementById('quiz-form');
+      form.innerHTML = '';
+      document.getElementById('quiz-result').classList.add('hidden');
+
+      // Progress
+      const pct = Math.round(((currentQuestion+1)/questions.length)*100);
+      document.getElementById('progress-bar').style.width = pct + '%';
+      document.getElementById('progress-label').textContent = `Step ${currentQuestion+1} of ${questions.length}`;
+
+      // Render question
+      const qDiv = document.createElement('div');
+      qDiv.className = "space-y-4";
+      const qLabel = document.createElement('div');
+      qLabel.className = "font-semibold text-lg";
+      qLabel.textContent = q.question;
+      qDiv.appendChild(qLabel);
+
+      q.options.forEach(opt => {
+        const id = `${q.id}_${opt.value}`;
+        const wrapper = document.createElement('div');
+        wrapper.className = "flex items-center gap-2";
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = q.id;
+        input.id = id;
+        input.value = opt.value;
+        input.className = "accent-purple-600";
+        if (answers[q.id] === opt.value) input.checked = true;
+        input.onchange = () => { answers[q.id] = opt.value; };
+        const label = document.createElement('label');
+        label.htmlFor = id;
+        label.textContent = opt.label;
+        wrapper.appendChild(input);
+        wrapper.appendChild(label);
+        qDiv.appendChild(wrapper);
+      });
+      form.appendChild(qDiv);
+
+      // Nav buttons
+      document.getElementById('prev-btn').disabled = currentQuestion === 0;
+      document.getElementById('next-btn').textContent = currentQuestion === questions.length-1 ? "Get Results" : "Next";
+    }
+
+    function showResults() {
+      let riskScore = 0;
+      let recommendations = [];
+
+      // Mood
+      if (answers.current_mood === 'sad' || answers.current_mood === 'anxious') {
+        riskScore += 2;
+      }
+      // Overwhelm
+      if (answers.overwhelmed === 'often' || answers.overwhelmed === 'almost_always') {
+        riskScore += 3;
+        recommendations.push("Try breaking tasks into smaller, manageable steps and practice time management techniques.");
+      }
+      // Sleep
+      if (answers.sleep_quality === 'poorly' || answers.sleep_quality === 'hardly') {
+        riskScore += 2;
+        recommendations.push("Focus on sleep hygiene - consistent bedtime, limited screen time before bed, and relaxing pre-sleep routine.");
+      }
+      // Irritability
+      if (answers.irritability === 'often' || answers.irritability === 'almost_always') {
+        riskScore += 2;
+        recommendations.push("Practice mindfulness and breathing exercises to manage emotional responses.");
+      }
+      // Sadness
+      if (answers.sadness === 'frequently') {
+        riskScore += 3;
+        recommendations.push("Consider speaking with a mental health professional for additional support.");
+      }
+      // Concentration
+      if (answers.concentration === 'frequently') {
+        riskScore += 2;
+        recommendations.push("Try meditation or focus-enhancing activities, and ensure you're getting adequate rest.");
+      }
+      // Social connection
+      if (answers.social_connection === 'rarely_connected' || answers.social_connection === 'not_connected') {
+        riskScore += 2;
+        recommendations.push("Reach out to friends or family, even for brief conversations - social connection is vital for mental health.");
+      }
+      // Anxiety
+      if (answers.anxiety_worry === 'frequently' || answers.anxiety_worry === 'constantly') {
+        riskScore += 3;
+        recommendations.push("Practice anxiety management techniques like deep breathing, grounding exercises, and regular physical activity.");
+      }
+      // Self-confidence
+      if (answers.self_confidence === 'no') {
+        riskScore += 2;
+        recommendations.push("Practice self-compassion and consider keeping a gratitude journal to focus on positive aspects of your life.");
+      }
+      // Support system
+      if (answers.support_system === 'rarely' || answers.support_system === 'no') {
+        riskScore += 2;
+        recommendations.push("Consider joining support groups or reaching out to mental health resources in your community.");
+      }
+
+      // Risk verdict
+      let verdict = '';
+      let color = '';
+      if (riskScore >= 12) {
+        verdict = "⚠️ High Risk: Consider Professional Support";
+        color = "text-red-600";
+      } else if (riskScore >= 6) {
+        verdict = "🧠 Moderate Risk: Some Areas for Improvement";
+        color = "text-amber-600";
+      } else {
+        verdict = "✅ Good Mental Wellness";
+        color = "text-green-600";
+      }
+
+      const resultDiv = document.getElementById('quiz-result');
+      resultDiv.className = "mt-8";
+      resultDiv.innerHTML = `
+        <div class="text-xl font-bold mb-2 ${color}">${verdict}</div>
+        <div class="mb-2">Your risk score: <span class="font-semibold">${riskScore}</span></div>
+        <div class="mb-2">
+          <span class="font-semibold">Recommendations:</span>
+          <ul class="list-disc ml-6">${recommendations.length > 0 ? recommendations.map(r=>`<li>${r}</li>`).join('') : "<li>You're doing well! Continue practicing self-care and mindfulness.</li>"}</ul>
+        </div>
+        <button onclick="location.reload()" class="mt-4 px-4 py-2 rounded-lg bg-purple-600 text-white font-semibold">Restart Quiz</button>
+      `;
+      document.getElementById('quiz-form').innerHTML = '';
+      document.getElementById('quiz-nav').classList.add('hidden');
+    }
+
+    // Navigation
+    document.getElementById('prev-btn').onclick = function() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+      }
+    };
+    document.getElementById('next-btn').onclick = function() {
+      // Validate
+      const q = questions[currentQuestion];
+      if (!answers[q.id]) {
+        alert('Please select an option.');
+        return;
+      }
+      if (currentQuestion === questions.length-1) {
+        showResults();
+      } else {
+        currentQuestion++;
+        renderQuestion();
+      }
+    };
+
+    // Initial render
+    renderQuestion();
+  </script>
+</body>
+</html>

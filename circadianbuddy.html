@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Circadian Rhythm Buddy | Healthara</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-emerald-100 to-sky-100 min-h-screen">
+
+  <div class="min-h-screen p-4 md:p-8">
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-8 max-w-4xl mx-auto">
+      <button onclick="window.location.href='physical_health.html'" class="rounded-full p-2 hover:bg-white/50 bg-white/30">
+        <!-- ArrowLeft SVG -->
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <h1 class="text-2xl font-bold text-gray-900">Circadian Rhythm Buddy 🌞</h1>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+      <!-- Left Side: Controls -->
+      <div class="md:col-span-1">
+        <div class="border-0 shadow-xl sticky top-8 rounded-2xl bg-white/90">
+          <div class="p-6 pb-2">
+            <div class="text-xl font-bold mb-4">Your Daily Rhythm</div>
+            <form id="plan-form" class="space-y-4">
+              <div>
+                <label for="city" class="block font-medium mb-1">Your City</label>
+                <input id="city" name="city" type="text" placeholder="e.g., New York" class="w-full rounded-lg border-gray-300 focus:ring-emerald-400" required />
+              </div>
+              <div>
+                <label for="wakeTime" class="block font-medium mb-1">Wake-up Time</label>
+                <input id="wakeTime" name="wakeTime" type="time" value="07:00" class="w-full rounded-lg border-gray-300 focus:ring-emerald-400" required />
+              </div>
+              <div>
+                <label for="sleepTime" class="block font-medium mb-1">Sleep Time</label>
+                <input id="sleepTime" name="sleepTime" type="time" value="23:00" class="w-full rounded-lg border-gray-300 focus:ring-emerald-400" required />
+              </div>
+              <button type="submit" id="generate-btn" class="w-full mt-6 bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white font-semibold py-2 rounded-lg shadow-lg transition-all duration-300">
+                Generate My Plan
+              </button>
+              <p id="error-msg" class="text-sm text-red-500 mt-2 hidden"></p>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side: Plan -->
+      <div class="md:col-span-2">
+        <div class="border-0 shadow-xl min-h-full rounded-2xl bg-white/90">
+          <div class="p-6 pb-2">
+            <div class="text-xl font-bold mb-4">Your Personalized Schedule</div>
+            <div id="plan-content" class="min-h-[16rem] flex flex-col items-center justify-center text-gray-500">
+              <svg class="w-12 h-12 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <p>Your daily plan will appear here.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple icon map for activities
+    const iconMap = {
+      "Sunlight": `<svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
+      "Breakfast": `<svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 3v7a4 4 0 0 0 4 4h0a4 4 0 0 0 4-4V3"/><path d="M8 21v-4"/><path d="M18 8v13"/><path d="M18 3v3"/></svg>`,
+      "Coffee": `<svg class="w-5 h-5 text-yellow-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 8V6a5 5 0 0 0-10 0v2"/><rect x="2" y="8" width="20" height="8" rx="4"/><path d="M6 16v2a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2"/></svg>`,
+      "Focus": `<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+      "Workout": `<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11"/><path d="M21 21l-1.5-1.5"/><path d="M3 3l1.5 1.5"/><path d="M18.5 5.5l-2-2"/><path d="M5.5 18.5l2 2"/></svg>`,
+      "Lunch": `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 3v7a4 4 0 0 0 4 4h0a4 4 0 0 0 4-4V3"/><path d="M8 21v-4"/><path d="M18 8v13"/><path d="M18 3v3"/></svg>`,
+      "Dinner": `<svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 3v7a4 4 0 0 0 4 4h0a4 4 0 0 0 4-4V3"/><path d="M8 21v-4"/><path d="M18 8v13"/><path d="M18 3v3"/></svg>`,
+      "Wind Down": `<svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19h16"/><path d="M4 15h16"/><path d="M4 11h16"/><path d="M4 7h16"/></svg>`,
+      "Sleep": `<svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>`,
+    };
+
+    // Sample static plan (replace with dynamic if backend is available)
+    function getSamplePlan(city, wake, sleep) {
+      return [
+        { time: wake, activity: "Sunlight", description: `Get sunlight exposure soon after waking up in ${city}.` },
+        { time: "07:30", activity: "Breakfast", description: "Eat a healthy breakfast to kickstart your metabolism." },
+        { time: "08:30", activity: "Coffee", description: "Enjoy your coffee, but avoid caffeine after noon." },
+        { time: "10:00", activity: "Focus", description: "Peak focus time for deep work or study." },
+        { time: "12:30", activity: "Lunch", description: "Eat a balanced lunch." },
+        { time: "17:00", activity: "Workout", description: "Ideal time for physical activity or exercise." },
+        { time: "19:30", activity: "Dinner", description: "Eat a light dinner." },
+        { time: "21:00", activity: "Wind Down", description: "Begin your wind-down routine: reading, relaxing, or meditation." },
+        { time: sleep, activity: "Sleep", description: "Aim to sleep at the same time each night for optimal rhythm." }
+      ];
+    }
+
+    document.getElementById('plan-form').onsubmit = function(e) {
+      e.preventDefault();
+      const city = document.getElementById('city').value.trim();
+      const wake = document.getElementById('wakeTime').value;
+      const sleep = document.getElementById('sleepTime').value;
+      const errorMsg = document.getElementById('error-msg');
+      const planContent = document.getElementById('plan-content');
+
+      if (!city || !wake || !sleep) {
+        errorMsg.textContent = "Please fill in all fields.";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+      errorMsg.classList.add('hidden');
+
+      // Show loading spinner
+      planContent.innerHTML = `
+        <div class="flex flex-col items-center justify-center h-64">
+          <svg class="h-12 w-12 animate-spin text-teal-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <p class="mt-4 text-gray-600">Aligning your rhythm...</p>
+        </div>
+      `;
+
+      setTimeout(() => {
+        const plan = getSamplePlan(city, wake, sleep);
+        planContent.innerHTML = plan.map((item, idx) => `
+          <div class="flex items-start gap-4 mb-6">
+            <div class="flex flex-col items-center">
+              ${iconMap[item.activity] || iconMap["Focus"]}
+              ${idx < plan.length - 1 ? '<div class="w-px h-16 bg-gray-200 mt-2"></div>' : ''}
+            </div>
+            <div>
+              <p class="font-bold">${item.time} - ${item.activity}</p>
+              <p class="text-sm text-gray-600">${item.description}</p>
+            </div>
+          </div>
+        `).join('');
+      }, 1200);
+    };
+  </script>
+</body>
+</html>

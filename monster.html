@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anxiety Monster Chase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%); /* Purple-blue gradient */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .game-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 16px;
+        }
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+        .instructions {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 24px;
+        }
+        .score {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2563eb;
+            margin-bottom: 24px;
+        }
+        .btn {
+            background: #3b82f6; /* Blue */
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: 8px;
+        }
+        .btn:hover {
+            background: #2563eb; /* Darker blue */
+        }
+        .btn:disabled {
+            background: #9ca3af; /* Gray */
+            cursor: not-allowed;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #374151;
+            border: 2px solid #d1d5db;
+        }
+        .btn-outline:hover {
+            background: #f9fafb;
+        }
+        .timer-section {
+            margin-bottom: 24px;
+        }
+        .timer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .timer-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+        }
+        .timer-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #374151;
+        }
+        .timer-bar {
+            width: 100%;
+            height: 16px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .timer-progress {
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 8px;
+        }
+        .timer-breathing {
+            background: #3b82f6; /* Blue */
+        }
+        .timer-holding {
+            background: #f59e0b; /* Orange */
+        }
+        .timer-fighting {
+            background: #ef4444; /* Red */
+        }
+        .breathing-guide {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 24px 0;
+        }
+        .breathing-circle-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .breathing-circle {
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #60a5fa, #3b82f6); /* Light to dark blue */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+            transition: transform 0.075s ease; /* Smooth scaling */
+        }
+        .breathing-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            border: 2px solid #93c5fd; /* Lighter blue */
+            opacity: 0.3;
+            transition: transform 0.075s ease;
+        }
+        .breathing-text {
+            margin-top: 16px;
+        }
+        .breathing-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #374151;
+        }
+        .breathing-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        .monster-container {
+            margin: 24px 0;
+        }
+        .monster {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .monster:hover {
+            transform: scale(1.05);
+        }
+        .monster:active {
+            transform: scale(0.95);
+        }
+        .monster-body {
+            width: 128px;
+            height: 128px;
+            background: linear-gradient(135deg, #9333ea, #7c3aed); /* Purple gradient */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(147, 51, 234, 0.3);
+            animation: bounce 2s infinite;
+            position: relative;
+        }
+        .monster-face {
+            font-size: 48px;
+        }
+        .monster-eyes {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+        .monster-eye {
+            width: 16px;
+            height: 16px;
+            background: #ef4444; /* Red eyes */
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+        .monster-health {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 96px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .monster-health-bar {
+            height: 100%;
+            background: #ef4444; /* Red health bar */
+            transition: width 0.3s ease;
+        }
+        .phase-message {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 16px 0;
+        }
+        .phase-breathing {
+            color: #2563eb; /* Blue */
+        }
+        .phase-holding {
+            color: #d97706; /* Dark orange */
+        }
+        .phase-fighting {
+            color: #dc2626; /* Dark red */
+            animation: pulse 1s infinite;
+        }
+        .phase-victory {
+            color: #16a34a; /* Green */
+            font-size: 24px;
+        }
+        .victory-skull {
+            font-size: 72px;
+            animation: pulse 1s infinite;
+            margin: 16px 0;
+        }
+        .hidden {
+            display: none;
+        }
+        /* Keyframe animations */
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40%, 43% {
+                transform: translateY(-15px);
+            }
+            70% {
+                transform: translateY(-7px);
+            }
+            90% {
+                transform: translateY(-3px);
+            }
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Ready Screen -->
+        <div id="ready-screen">
+            <h1 class="title">Anxiety Monster Chase</h1>
+            <p class="subtitle">Practice breathing exercises to defeat anxiety monsters!</p>
+            <p class="instructions">Watch the monster shrink as you breathe in and grow as you breathe out. Then hold your breath and tap the monster to defeat it!</p>
+            <div class="score">Monsters Defeated: <span id="score-display">0</span></div>
+            <button class="btn" onclick="startGame()">Start Breathing Exercise</button>
+        </div>
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <h2 class="title">Anxiety Monster Chase</h2>
+            <div class="subtitle">Monsters Defeated: <span id="game-score">0</span></div>
+            <!-- Timer -->
+            <div class="timer-section">
+                <div class="timer-header">
+                    <span class="timer-label" id="timer-label">Ready</span>
+                    <span class="timer-value" id="timer-value">10</span>
+                </div>
+                <div class="timer-bar">
+                    <div class="timer-progress" id="timer-progress"></div>
+                </div>
+            </div>
+            <!-- Breathing Guide -->
+            <div id="breathing-guide" class="breathing-guide hidden">
+                <div class="breathing-circle-container">
+                    <div class="breathing-circle" id="breathing-circle">
+                        <span id="breathing-action">Inhale</span>
+                    </div>
+                    <div class="breathing-ring" id="breathing-ring1"></div>
+                    <div class="breathing-ring" id="breathing-ring2"></div>
+                </div>
+                <div class="breathing-text">
+                    <div class="breathing-title" id="breathing-title">Breathe In</div>
+                    <div class="breathing-subtitle" id="breathing-subtitle">Fill your lungs slowly</div>
+                </div>
+            </div>
+            <!-- Monster -->
+            <div id="monster-container" class="monster-container hidden">
+                <div class="monster" id="monster" onclick="hitMonster()">
+                    <div class="monster-body" id="monster-body">
+                        <div class="monster-eyes">
+                            <div class="monster-eye"></div>
+                            <div class="monster-eye"></div>
+                        </div>
+                        <div class="monster-face">👹</div>
+                        <div class="monster-health" id="monster-health-container">
+                            <div class="monster-health-bar" id="monster-health-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="phase-message" id="monster-message"></div>
+            </div>
+            <!-- Victory Screen -->
+            <div id="victory-container" class="hidden">
+                <div class="victory-skull">💀</div>
+                <div class="phase-message phase-victory">Monster Defeated!</div>
+            </div>
+            <!-- Phase Messages -->
+            <div class="phase-message" id="phase-message"></div>
+        </div>
+        <!-- End Screen -->
+        <div id="end-screen" class="hidden">
+            <h2 class="title phase-victory">Well Done! 🎉</h2>
+            <p class="subtitle">You've successfully completed a breathing exercise!</p>
+            <div class="score">Total Monsters Defeated: <span id="final-score">0</span></div>
+            <button class="btn" onclick="startGame()">Practice Again</button>
+            <button class="btn btn-outline" onclick="resetToMenu()">Back to Menu</button>
+        </div>
+    </div>
+    <script>
+        // Game state
+        let gameState = {
+            phase: 'ready', // ready, breathing, holding, fighting, victory, ended
+            timer: 10,
+            score: 0,
+            monsterHealth: 100,
+            monsterSize: 1,
+            breathingPhase: 'inhale', // inhale, exhale
+            breathingScale: 1,
+            timerInterval: null,
+            breathingInterval: null
+        };
+        // Audio context (simplified - you can add actual audio files)
+        function playSound(type) {
+            console.log(`Playing ${type} sound`);
+            // You can replace this with actual audio playing logic
+            // const audio = new Audio(`sounds/${type}.mp3`);
+            // audio.play();
+        }
+        // Update displays
+        function updateDisplay() {
+            document.getElementById('score-display').textContent = gameState.score;
+            document.getElementById('game-score').textContent = gameState.score;
+            document.getElementById('final-score').textContent = gameState.score;
+            document.getElementById('timer-value').textContent = Math.ceil(Math.max(0, gameState.timer));
+        }
+        // Timer management
+        function startTimer(duration) {
+            gameState.timer = duration;
+            clearInterval(gameState.timerInterval);
+            
+            gameState.timerInterval = setInterval(() => {
+                gameState.timer -= 1;
+                updateDisplay();
+                updateTimerBar();
+                
+                if (gameState.timer <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    handleTimerComplete();
+                }
+            }, 1000);
+        }
+        function updateTimerBar() {
+            const maxTime = gameState.phase === 'holding' ? 3 : 10; // Holding phase is shorter
+            const progress = (gameState.timer / maxTime) * 100;
+            const progressBar = document.getElementById('timer-progress');
+            
+            progressBar.style.width = Math.max(0, progress) + '%';
+            
+            // Update timer style based on phase
+            progressBar.className = 'timer-progress timer-' + gameState.phase;
+        }
+        function handleTimerComplete() {
+            if (gameState.phase === 'breathing') {
+                startHoldingPhase();
+            } else if (gameState.phase === 'holding') {
+                startFightingPhase();
+            } else if (gameState.phase === 'fighting') {
+                // Monster wins - reset game if time runs out in fighting phase
+                resetGame();
+            }
+        }
+        // Breathing animation
+        function startBreathingAnimation() {
+            clearInterval(gameState.breathingInterval);
+            let startTime = Date.now();
+            let currentPhase = 'inhale';
+            const cycleTime = 4000; // 4 seconds per phase (2s inhale, 2s exhale)
+            
+            gameState.breathingInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const progress = (elapsed % cycleTime) / cycleTime; // Progress within current 4s cycle
+                
+                if (elapsed > cycleTime && currentPhase === 'inhale') {
+                    currentPhase = 'exhale';
+                    startTime = Date.now(); // Reset startTime for the new phase
+                    gameState.breathingPhase = 'exhale';
+                } else if (elapsed > cycleTime && currentPhase === 'exhale') {
+                    currentPhase = 'inhale';
+                    startTime = Date.now(); // Reset startTime for the new phase
+                    gameState.breathingPhase = 'inhale';
+                }
+                
+                // Calculate scale for breathing circle
+                let scale;
+                if (currentPhase === 'inhale') {
+                    scale = 1 + (progress * 0.5); // Grow from 1 to 1.5
+                } else {
+                    scale = 1.5 - (progress * 0.5); // Shrink from 1.5 to 1
+                }
+                
+                gameState.breathingScale = scale;
+                updateBreathingDisplay();
+            }, 16); // ~60fps for smooth animation
+        }
+        function updateBreathingDisplay() {
+            const circle = document.getElementById('breathing-circle');
+            const ring1 = document.getElementById('breathing-ring1');
+            const ring2 = document.getElementById('breathing-ring2');
+            const action = document.getElementById('breathing-action');
+            const title = document.getElementById('breathing-title');
+            const subtitle = document.getElementById('breathing-subtitle');
+            const monster = document.getElementById('monster');
+            
+            if (circle) {
+                circle.style.transform = `scale(${gameState.breathingScale})`;
+                // Rings scale slightly differently for visual effect
+                ring1.style.transform = `scale(${1.2 + (gameState.breathingScale - 1) * 0.5})`;
+                ring2.style.transform = `scale(${1.4 + (gameState.breathingScale - 1) * 0.3})`;
+                
+                // Monster size opposite to breathing circle - shrinks on inhale, grows on exhale
+                let monsterScale;
+                if (gameState.breathingPhase === 'inhale') {
+                    // As we inhale (circle grows), monster shrinks
+                    monsterScale = 1.5 - (gameState.breathingScale - 1); // Monster goes from 1.5 down to 1
+                } else {
+                    // As we exhale (circle shrinks), monster grows
+                    monsterScale = 1 + (1.5 - gameState.breathingScale); // Monster goes from 1 up to 1.5
+                }
+                
+                if (monster && gameState.phase === 'breathing') {
+                    monster.style.transform = `scale(${Math.max(0.5, Math.min(1.5, monsterScale))})`; // Clamp scale
+                }
+                
+                if (gameState.breathingPhase === 'inhale') {
+                    action.textContent = 'Inhale';
+                    title.textContent = 'Breathe In';
+                    subtitle.textContent = 'Fill your lungs slowly';
+                } else {
+                    action.textContent = 'Exhale';
+                    title.textContent = 'Breathe Out';
+                    subtitle.textContent = 'Release the air gently';
+                }
+            }
+        }
+        // Game phases
+        function startGame() {
+            gameState.phase = 'breathing';
+            gameState.monsterHealth = 100; // Reset monster health for new game
+            gameState.monsterSize = 1;
+            
+            showScreen('game-screen');
+            updateTimerLabel('Breathing Phase');
+            startTimer(10); // Breathing phase lasts 10 seconds
+            startBreathingPhase();
+        }
+        function startBreathingPhase() {
+            gameState.phase = 'breathing';
+            document.getElementById('breathing-guide').classList.remove('hidden');
+            document.getElementById('monster-container').classList.remove('hidden');
+            document.getElementById('victory-container').classList.add('hidden'); // Hide victory message
+            document.getElementById('phase-message').textContent = 'Breathe to shrink the anxiety monster';
+            document.getElementById('phase-message').className = 'phase-message phase-breathing';
+            document.getElementById('monster-message').textContent = 'Watch it shrink when you inhale!';
+            document.getElementById('monster-message').className = 'phase-message phase-breathing';
+            
+            // Reset monster for breathing phase
+            gameState.monsterHealth = 100;
+            updateMonsterDisplay();
+            
+            startBreathingAnimation();
+        }
+        function startHoldingPhase() {
+            gameState.phase = 'holding';
+            clearInterval(gameState.breathingInterval); // Stop breathing animation
+            document.getElementById('breathing-guide').classList.add('hidden');
+            updateTimerLabel('Get Ready...');
+            document.getElementById('phase-message').textContent = 'Hold your breath...';
+            document.getElementById('phase-message').className = 'phase-message phase-holding';
+            
+            startTimer(3); // Holding phase lasts 3 seconds
+        }
+        function startFightingPhase() {
+            gameState.phase = 'fighting';
+            updateTimerLabel('Fighting Phase');
+            document.getElementById('monster-container').classList.remove('hidden');
+            document.getElementById('phase-message').textContent = 'Tap the monster to defeat it!';
+            document.getElementById('phase-message').className = 'phase-message phase-fighting';
+            document.getElementById('monster-message').textContent = 'Tap the Monster!';
+            document.getElementById('monster-message').className = 'phase-message phase-fighting';
+            
+            updateMonsterDisplay(); // Ensure monster is visible and health bar is active
+            startTimer(10); // Fighting phase lasts 10 seconds
+        }
+        function hitMonster() {
+            if (gameState.phase !== 'fighting') return; // Only allow hits during fighting phase
+            
+            playSound('hit'); // Placeholder for sound effect
+            gameState.monsterHealth = Math.max(0, gameState.monsterHealth - 10); // Reduce health by 10
+            gameState.monsterSize = gameState.monsterHealth / 100; // Update monster size based on health
+            
+            updateMonsterDisplay();
+            
+            if (gameState.monsterHealth <= 0) {
+                startVictoryPhase();
+            }
+        }
+        function updateMonsterDisplay() {
+            const monster = document.getElementById('monster');
+            const healthBar = document.getElementById('monster-health-bar');
+            const healthContainer = document.getElementById('monster-health-container');
+            
+            // Only apply health-based scaling during fighting phase
+            if (gameState.phase === 'fighting') {
+                monster.style.transform = `scale(${gameState.monsterSize})`;
+                healthBar.style.width = gameState.monsterHealth + '%';
+                healthContainer.style.display = 'block'; // Show health bar
+            } else if (gameState.phase === 'breathing') {
+                // During breathing, hide health bar and let breathing animation control size
+                healthContainer.style.display = 'none';
+            } else {
+                // Default state (e.g., ready screen)
+                monster.style.transform = `scale(1)`;
+                healthContainer.style.display = 'block';
+                healthBar.style.width = gameState.monsterHealth + '%';
+            }
+        }
+        function startVictoryPhase() {
+            gameState.phase = 'victory';
+            clearInterval(gameState.timerInterval); // Stop timer
+            
+            document.getElementById('monster-container').classList.add('hidden');
+            document.getElementById('victory-container').classList.remove('hidden');
+            document.getElementById('phase-message').textContent = 'Monster Defeated! 🎉';
+            document.getElementById('phase-message').className = 'phase-message phase-victory';
+            
+            playSound('success'); // Placeholder for sound effect
+            
+            setTimeout(() => {
+                gameState.score += 1; // Increment score
+                showEndScreen();
+            }, 2000); // Show victory message for 2 seconds
+        }
+        function showEndScreen() {
+            gameState.phase = 'ended';
+            updateDisplay();
+            showScreen('end-screen');
+        }
+        function resetGame() {
+            clearInterval(gameState.timerInterval);
+            clearInterval(gameState.breathingInterval);
+            gameState.phase = 'ready';
+            gameState.timer = 10;
+            gameState.monsterHealth = 100;
+            gameState.monsterSize = 1;
+            showScreen('ready-screen');
+        }
+        function resetToMenu() {
+            // This function would typically navigate back to the mental health dashboard
+            window.location.href = 'mentalhealth.html';
+        }
+        function updateTimerLabel(text) {
+            document.getElementById('timer-label').textContent = text;
+        }
+        function showScreen(screenId) {
+            // Hide all screens
+            document.getElementById('ready-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            
+            // Show target screen
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+        // Initialize display when the page loads
+        updateDisplay();
+    </script>
+</body>
+</html>

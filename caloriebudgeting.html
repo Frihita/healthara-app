@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calorie Budgeting | Healthara</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-emerald-100 to-sky-100 min-h-screen">
+
+  <div class="min-h-screen p-4 md:p-8">
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-8 max-w-4xl mx-auto">
+      <button onclick="window.location.href='physical_health.html'" class="rounded-full p-2 hover:bg-white/50 bg-white/30">
+        <!-- ArrowLeft SVG -->
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <h1 class="text-2xl font-bold text-gray-900">Calorie Budgeting 📊</h1>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+      <!-- Left Side: Summary -->
+      <div class="md:col-span-1">
+        <div class="border-0 shadow-xl sticky top-8 rounded-2xl bg-white/90">
+          <div class="p-6 pb-2">
+            <div class="text-xl font-bold mb-4">Today's Budget</div>
+            <div class="relative w-40 h-40 mx-auto">
+              <svg class="w-full h-full" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#e6e6e6"
+                  stroke-width="3"
+                />
+                <path
+                  id="calorie-progress"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#14b8a6"
+                  stroke-width="3"
+                  stroke-dasharray="0, 100"
+                />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span id="total-calories" class="text-3xl font-bold">0</span>
+                <span class="text-gray-500">/ 2000 kcal</span>
+              </div>
+            </div>
+            <div class="space-y-3 px-2">
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>Protein</span>
+                  <span><span id="total-protein">0</span>g / 100g</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded h-2">
+                  <div id="progress-protein" class="bg-teal-500 h-2 rounded" style="width:0%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>Carbs</span>
+                  <span><span id="total-carbs">0</span>g / 250g</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded h-2">
+                  <div id="progress-carbs" class="bg-teal-500 h-2 rounded" style="width:0%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>Fat</span>
+                  <span><span id="total-fat">0</span>g / 65g</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded h-2">
+                  <div id="progress-fat" class="bg-teal-500 h-2 rounded" style="width:0%"></div>
+                </div>
+              </div>
+            </div>
+            <button id="open-dialog" class="w-full mt-6 bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white font-semibold py-2 rounded-lg shadow-lg transition-all duration-300">
+              + Add Meal
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side: Meal Entries -->
+      <div class="md:col-span-2 space-y-6">
+        <div id="ai-tip" class="hidden border-0 shadow-lg bg-teal-50 rounded-2xl p-4 flex items-start gap-3">
+          <!-- Brain SVG -->
+          <svg class="w-6 h-6 text-teal-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M17 8A5 5 0 0 0 7 8v8a5 5 0 0 0 8.5 4.5A5 5 0 0 0 17 16V8a5 5 0 0 0-1.5-4z"/>
+          </svg>
+          <div>
+            <h4 class="font-semibold text-teal-800">Smart Tip</h4>
+            <p class="text-sm text-teal-700" id="ai-tip-text"></p>
+          </div>
+        </div>
+        <div class="border-0 shadow-xl rounded-2xl bg-white/90">
+          <div class="p-6 pb-2">
+            <div class="text-xl font-bold mb-4">Today's Meals</div>
+            <div id="meal-list" class="space-y-4">
+              <p class="text-center text-gray-500">No meals added yet for today.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Dialog for Adding Meal -->
+  <div id="dialog-backdrop" class="fixed inset-0 bg-black/30 z-50 hidden"></div>
+  <div id="dialog-modal" class="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl max-w-md w-full p-6 hidden">
+    <div class="text-lg font-bold mb-4">Add a New Meal</div>
+    <form id="add-meal-form" class="space-y-4">
+      <div>
+        <label class="block font-medium mb-1">Food Item</label>
+        <div class="flex gap-2">
+          <input id="food-item" type="text" class="w-full rounded-lg border-gray-300" placeholder="e.g. Grilled chicken breast, 1 medium banana" required />
+          <button type="button" id="lookup-nutrition" class="px-3 py-2 rounded bg-blue-500 text-white">Lookup</button>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">Enter a food and click Lookup to auto-fill nutrition.</p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block font-medium mb-1">Calories</label>
+          <input id="calories" type="number" class="w-full rounded-lg border-gray-300" placeholder="kcal" required />
+        </div>
+        <div>
+          <label class="block font-medium mb-1">Protein</label>
+          <input id="protein" type="number" class="w-full rounded-lg border-gray-300" placeholder="grams" />
+        </div>
+        <div>
+          <label class="block font-medium mb-1">Carbs</label>
+          <input id="carbs" type="number" class="w-full rounded-lg border-gray-300" placeholder="grams" />
+        </div>
+        <div>
+          <label class="block font-medium mb-1">Fat</label>
+          <input id="fat" type="number" class="w-full rounded-lg border-gray-300" placeholder="grams" />
+        </div>
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Meal Type</label>
+        <select id="meal-type" class="w-full rounded-lg border-gray-300" required>
+          <option value="">Select Meal Type</option>
+          <option value="breakfast">🌅 Breakfast</option>
+          <option value="lunch">🍽️ Lunch</option>
+          <option value="dinner">🌙 Dinner</option>
+          <option value="snack">🍎 Snack</option>
+        </select>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" id="cancel-dialog" class="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200">Cancel</button>
+        <button type="submit" class="px-4 py-2 rounded bg-teal-600 text-white hover:bg-teal-700">Add Entry</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // In-memory meal entries
+    let entries = [];
+
+    // Budget constants
+    const DAILY_BUDGET = { calories: 2000, protein: 100, carbs: 250, fat: 65 };
+
+    // Modal dialog logic
+    const dialogBackdrop = document.getElementById('dialog-backdrop');
+    const dialogModal = document.getElementById('dialog-modal');
+    document.getElementById('open-dialog').onclick = () => {
+      dialogBackdrop.classList.remove('hidden');
+      dialogModal.classList.remove('hidden');
+    };
+    document.getElementById('cancel-dialog').onclick = closeDialog;
+    dialogBackdrop.onclick = closeDialog;
+    function closeDialog() {
+      dialogBackdrop.classList.add('hidden');
+      dialogModal.classList.add('hidden');
+      document.getElementById('add-meal-form').reset();
+    }
+
+    // Nutrition lookup using Base44 API (simulated for this demo)
+    document.getElementById('lookup-nutrition').onclick = async function() {
+      const foodItem = document.getElementById('food-item').value.trim();
+      if (!foodItem) {
+        alert('Please enter a food item.');
+        return;
+      }
+      // Show loading state
+      document.getElementById('lookup-nutrition').textContent = '...';
+      document.getElementById('lookup-nutrition').disabled = true;
+
+      // --- BEGIN: Simulated API call ---
+      let data;
+      if (foodItem.toLowerCase().includes('banana')) {
+        data = { calories: 105, protein: 1, carbs: 27, fat: 0 };
+      } else if (foodItem.toLowerCase().includes('chicken')) {
+        data = { calories: 165, protein: 31, carbs: 0, fat: 4 };
+      } else if (foodItem.toLowerCase().includes('rice')) {
+        data = { calories: 206, protein: 4, carbs: 45, fat: 0 };
+      } else {
+        // Fallback for other items or if no specific match
+        data = { calories: 100, protein: 2, carbs: 20, fat: 1 };
+      }
+      // --- END: Simulated API call ---
+
+      setTimeout(() => { // Simulate network delay
+        document.getElementById('calories').value = data.calories;
+        document.getElementById('protein').value = data.protein;
+        document.getElementById('carbs').value = data.carbs;
+        document.getElementById('fat').value = data.fat;
+        // Restore button
+        document.getElementById('lookup-nutrition').textContent = 'Lookup';
+        document.getElementById('lookup-nutrition').disabled = false;
+      }, 500); // 500ms delay
+    };
+
+    // Add meal form logic
+    document.getElementById('add-meal-form').onsubmit = function(e) {
+      e.preventDefault();
+      const food_item = document.getElementById('food-item').value.trim();
+      const calories = parseInt(document.getElementById('calories').value, 10) || 0;
+      const protein = parseInt(document.getElementById('protein').value, 10) || 0;
+      const carbs = parseInt(document.getElementById('carbs').value, 10) || 0;
+      const fat = parseInt(document.getElementById('fat').value, 10) || 0;
+      const meal_type = document.getElementById('meal-type').value;
+
+      if (!food_item || !calories || !meal_type) {
+        alert('Please fill all required fields');
+        return;
+      }
+
+      entries.push({ id: Date.now(), food_item, calories, protein, carbs, fat, meal_type });
+      closeDialog();
+      renderMeals();
+      renderSummary();
+      showAITip();
+    };
+
+    // Delete meal logic
+    function deleteMeal(id) {
+      entries = entries.filter(e => e.id !== id);
+      renderMeals();
+      renderSummary();
+      showAITip();
+    }
+
+    // Render meal entries
+    function renderMeals() {
+      const mealList = document.getElementById('meal-list');
+      if (entries.length === 0) {
+        mealList.innerHTML = `<p class="text-center text-gray-500">No meals added yet for today.</p>`;
+        return;
+      }
+      mealList.innerHTML = entries.map(entry => `
+        <li class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
+              ${getMealIcon(entry.meal_type)}
+            </div>
+            <div>
+              <p class="font-semibold">${entry.food_item}</p>
+              <p class="text-sm text-gray-500 capitalize">${entry.meal_type}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <p class="font-bold">${entry.calories} kcal</p>
+            <button onclick="deleteMeal(${entry.id})" class="rounded-full p-2 hover:bg-red-100">
+              <!-- Trash SVG -->
+              <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+                <line x1="10" y1="11" x2="10" y2="17"/>
+                <line x1="14" y1="11" x2="14" y2="17"/>
+              </svg>
+            </button>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    // Render summary/progress
+    function renderSummary() {
+      const totals = {
+        calories: entries.reduce((sum, e) => sum + (e.calories || 0), 0),
+        protein: entries.reduce((sum, e) => sum + (e.protein || 0), 0),
+        carbs: entries.reduce((sum, e) => sum + (e.carbs || 0), 0),
+        fat: entries.reduce((sum, e) => sum + (e.fat || 0), 0),
+      };
+      document.getElementById('total-calories').textContent = totals.calories;
+      document.getElementById('total-protein').textContent = totals.protein;
+      document.getElementById('total-carbs').textContent = totals.carbs;
+      document.getElementById('total-fat').textContent = totals.fat;
+
+      // Progress bars
+      document.getElementById('progress-protein').style.width = Math.min(100, (totals.protein / DAILY_BUDGET.protein) * 100) + '%';
+      document.getElementById('progress-carbs').style.width = Math.min(100, (totals.carbs / DAILY_BUDGET.carbs) * 100) + '%';
+      document.getElementById('progress-fat').style.width = Math.min(100, (totals.fat / DAILY_BUDGET.fat) * 100) + '%';
+
+      // Calorie donut
+      const calorieProgress = Math.min(100, (totals.calories / DAILY_BUDGET.calories) * 100);
+      document.getElementById('calorie-progress').setAttribute('stroke', calorieProgress > 100 ? '#e53e3e' : '#14b8a6');
+      document.getElementById('calorie-progress').setAttribute('stroke-dasharray', `${calorieProgress}, 100`);
+    }
+
+    // Show a static AI tip (for demo)
+    function showAITip() {
+      const aiTip = document.getElementById('ai-tip');
+      const aiTipText = document.getElementById('ai-tip-text');
+      if (entries.length === 0) {
+        aiTip.classList.add('hidden');
+        return;
+      }
+      // Simple static tip for demo
+      aiTipText.textContent = "Try to include a source of protein in your next meal for better satiety!";
+      aiTip.classList.remove('hidden');
+    }
+
+    // Meal type icon
+    function getMealIcon(type) {
+      if (type === 'breakfast') {
+        return `<svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 2v2M16 2v2M3 10h18M5 10v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10"/></svg>`;
+      }
+      if (type === 'lunch') {
+        return `<svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8a8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>`;
+      }
+      if (type === 'dinner') {
+        return `<svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 3v7a4 4 0 0 0 4 4h0a4 4 0 0 0 4-4V3"/><path d="M8 21v-4"/><path d="M18 8v13"/><path d="M18 3v3"/></svg>`;
+      }
+      if (type === 'snack') {
+        return `<svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8a8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>`;
+      }
+      return '';
+    }
+
+    // Initial render calls
+    renderMeals();
+    renderSummary();
+  </script>
+</body>
+</html>

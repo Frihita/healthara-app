@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compassion Quest | Healthara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            margin: 0 auto;
+        }
+        
+        .wheel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fce7f3;
+            border-radius: 50%;
+            transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+            transform-origin: center;
+            border: 8px solid #f9a8d4;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .emotion-segment {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: bold;
+            font-size: 2rem;
+            color: #4a5568;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .emotion-segment span {
+            position: absolute;
+            bottom: 25px;
+            transform: rotate(60deg);
+        }
+        
+        .arrow {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ef4444;
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        
+        .spin-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            z-index: 20;
+        }
+        
+        .spin-button:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+        }
+        
+        .spin-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .game-card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #3b82f6;
+        }
+        
+        .game-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .dialog-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .dialog-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .dialog-overlay.active .dialog-box {
+            transform: scale(1);
+        }
+        
+        .color-swatch {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .color-swatch.active {
+            border: 2px solid #3b82f6;
+            transform: scale(1.1);
+        }
+        
+        .tool-button {
+            padding: 0.5rem 1rem;
+            background: #e0f2fe;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            border: 1px solid #bfdbfe;
+            transition: all 0.2s ease;
+        }
+        
+        .tool-button:hover {
+            background: #bfdbfe;
+        }
+        
+        .tool-button.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #2563eb;
+        }
+        
+        /* Animation for wheel segments */
+        @keyframes segmentPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .emotion-segment:hover {
+            animation: segmentPulse 1s ease-in-out;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .wheel-container {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .emotion-segment {
+                font-size: 1.5rem;
+            }
+            
+            .spin-button {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="container mx-auto">
+        <!-- Main Card -->
+        <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <button onclick="window.history.back()" class="absolute top-4 left-4 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-arrow-left text-gray-600"></i>
+                </button>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Compassion Quest 🪄</h1>
+                <p class="text-gray-600">Spin the wheel and discover your daily self-compassion challenge</p>
+            </div>
+
+            <!-- Wheel Section -->
+            <div id="wheel-section" class="mb-8">
+                <div class="wheel-container">
+                    <div class="wheel" id="wheel">
+                        <!-- Emotion segments -->
+                        <div class="emotion-segment absolute" style="background-color: #a7f3d0; transform: rotate(0deg);" data-emotion="Joy" data-number="1"><span>1</span></div>
+                        <div class="emotion-segment absolute" style="background-color: #fde047; transform: rotate(60deg);" data-emotion="Surprise" data-number="2"><span>2</span></div>
+                        <div class="emotion-segment absolute" style="background-color: #fca5a5; transform: rotate(120deg);" data-emotion="Sadness" data-number="3"><span>3</span></div>
+                        <div class="emotion-segment absolute" style="background-color: #bfdbfe; transform: rotate(180deg);" data-emotion="Anger" data-number="4"><span>4</span></div>
+                        <div class="emotion-segment absolute" style="background-color: #d1d5db; transform: rotate(240deg);" data-emotion="Fear" data-number="5"><span>5</span></div>
+                        <div class="emotion-segment absolute" style="background-color: #d8b4fe; transform: rotate(300deg);" data-emotion="Disgust" data-number="6"><span>6</span></div>
+                    </div>
+                    <div class="arrow"></div>
+                    <button id="spinBtn" class="spin-button">Spin Wheel</button>
+                </div>
+
+                <!-- Emotion Legend -->
+                <div class="mt-8 text-center">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Emotion Key:</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-md mx-auto">
+                        <div class="flex items-center justify-center gap-2 p-2 bg-gray-50 rounded-lg">
+                            <div class="w-4 h-4 rounded-full bg-green-300"></div>
+                            <span class="text-sm">1: Joy</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 p-2 bg-gray-50 rounded-lg">
+                            <div class="w-4 h-4 rounded-full bg-yellow-300"></div>
+                            <span class="text-sm">2: Surprise</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 p-2 bg-gray-50 rounded-lg">
+                            <div class="w-4 h-4 rounded-full bg-red-300"></div>
+                            <span class="text-sm">3: Sadness</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 p-2 bg-gray-50 rounded-lg">
+                            <div class="w-4 h-4 rounded-full bg-blue-300"></div>
+                            <span class="text-sm">4: Anger</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 p-2 bg-gray-50 rounded-lg">
+                            <div class="w-4 h-4 rounded-full bg-gray-300"></div>
+                            <span class="text-sm">5: Fear</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 p-2 bg-gray-50 rounded-lg">
+                            <div class="w-4 h-4 rounded-full bg-purple-300"></div>
+                            <span class="text-sm">6: Disgust</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Section (Hidden initially) -->
+            <div id="activity-section" class="hidden">
+                <!-- Content will be dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Emotion Reflection Modal -->
+    <div id="emotion-modal" class="dialog-overlay">
+        <div class="dialog-box">
+            <h3 class="text-2xl font-bold mb-4 text-blue-600">You landed on <span id="emotion-name" class="text-purple-600"></span>!</h3>
+            
+            <div id="emotion-reflection-section">
+                <p class="text-gray-700 mb-4">Take a moment to reflect on this emotion. When was the last time you felt this way?</p>
+                <textarea id="emotion-text-input" class="w-full h-24 p-3 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Describe the situation or your feelings..."></textarea>
+                <button id="continue-game-btn" class="mt-4 px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors font-semibold">
+                    Continue to Activities
+                </button>
+            </div>
+
+            <div id="game-selection-section" class="hidden text-left mt-6">
+                <h4 class="text-xl font-bold mb-4 text-center text-gray-800">Choose Your Compassion Activity:</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="game-card" data-activity="Affirmation">
+                        <i class="game-card-icon fas fa-heart"></i>
+                        <p class="font-semibold text-gray-800">Daily Affirmation</p>
+                        <p class="text-sm text-gray-600 mt-1">Create positive self-talk</p>
+                    </div>
+                    <div class="game-card" data-activity="Guess the Number">
+                        <i class="game-card-icon fas fa-dice"></i>
+                        <p class="font-semibold text-gray-800">Guess the Number</p>
+                        <p class="text-sm text-gray-600 mt-1">Fun number guessing game</p>
+                    </div>
+                    <div class="game-card" data-activity="Journaling">
+                        <i class="game-card-icon fas fa-book"></i>
+                        <p class="font-semibold text-gray-800">Journaling</p>
+                        <p class="text-sm text-gray-600 mt-1">Reflect and write</p>
+                    </div>
+                    <div class="game-card" data-activity="Word Scramble">
+                        <i class="game-card-icon fas fa-shuffle"></i>
+                        <p class="font-semibold text-gray-800">Word Scramble</p>
+                        <p class="text-sm text-gray-600 mt-1">Unscramble positive words</p>
+                    </div>
+                    <div class="game-card" data-activity="Coloring">
+                        <i class="game-card-icon fas fa-palette"></i>
+                        <p class="font-semibold text-gray-800">Coloring</p>
+                        <p class="text-sm text-gray-600 mt-1">Creative relaxation</p>
+                    </div>
+                    <div class="game-card" data-activity="Mindful Maze">
+                        <i class="game-card-icon fas fa-brain"></i>
+                        <p class="font-semibold text-gray-800">Mindful Maze</p>
+                        <p class="text-sm text-gray-600 mt-1">Focus and navigate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let currentEmotion = null;
+        let isSpinning = false;
+        let currentRotation = 0;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWheel();
+            setupEventListeners();
+        });
+
+        function initializeWheel() {
+            const wheel = document.getElementById('wheel');
+            const segments = wheel.querySelectorAll('.emotion-segment');
+            
+            // Set initial rotation for proper text alignment
+            segments.forEach((segment, index) => {
+                const rotation = index * 60;
+                segment.style.transform = `rotate(${rotation}deg)`;
+                
+                // Adjust text rotation to keep numbers upright
+                const span = segment.querySelector('span');
+                span.style.transform = `rotate(${-rotation}deg)`;
+            });
+        }
+
+        function setupEventListeners() {
+            // Spin button
+            document.getElementById('spinBtn').addEventListener('click', spinWheel);
+            
+            // Continue to game selection
+            document.getElementById('continue-game-btn').addEventListener('click', showGameSelection);
+            
+            // Game card selection
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const activity = this.getAttribute('data-activity');
+                    startActivity(activity);
+                });
+            });
+            
+            // Close modal by clicking outside
+            document.getElementById('emotion-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        }
+
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            const spinBtn = document.getElementById('spinBtn');
+            spinBtn.disabled = true;
+            spinBtn.textContent = 'Spinning...';
+            
+            const wheel = document.getElementById('wheel');
+            const extraRotation = 1800 + Math.random() * 1800; // 5-10 full rotations
+            const targetRotation = currentRotation + extraRotation;
+            
+            wheel.style.transition = 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)';
+            wheel.style.transform = `rotate(${targetRotation}deg)`;
+            
+            setTimeout(() => {
+                const finalRotation = targetRotation % 360;
+                const segmentIndex = Math.floor((360 - finalRotation) / 60) % 6;
+                const segments = wheel.querySelectorAll('.emotion-segment');
+                const selectedSegment = segments[segmentIndex];
+                
+                currentEmotion = {
+                    name: selectedSegment.getAttribute('data-emotion'),
+                    number: selectedSegment.getAttribute('data-number')
+                };
+                
+                currentRotation = finalRotation;
+                isSpinning = false;
+                spinBtn.disabled = false;
+                spinBtn.textContent = 'Spin Again';
+                
+                showEmotionModal();
+            }, 5000);
+        }
+
+        function showEmotionModal() {
+            const modal = document.getElementById('emotion-modal');
+            const emotionName = document.getElementById('emotion-name');
+            
+            emotionName.textContent = currentEmotion.name;
+            document.getElementById('emotion-text-input').value = '';
+            document.getElementById('emotion-reflection-section').style.display = 'block';
+            document.getElementById('game-selection-section').style.display = 'none';
+            
+            modal.classList.add('active');
+        }
+
+        function showGameSelection() {
+            const reflectionText = document.getElementById('emotion-text-input').value.trim();
+            if (!reflectionText) {
+                alert('Please take a moment to reflect on your emotion before continuing.');
+                return;
+            }
+            
+            document.getElementById('emotion-reflection-section').style.display = 'none';
+            document.getElementById('game-selection-section').style.display = 'block';
+        }
+
+        function startActivity(activityType) {
+            closeModal();
+            
+            const activitySection = document.getElementById('activity-section');
+            const wheelSection = document.getElementById('wheel-section');
+            
+            wheelSection.style.display = 'none';
+            activitySection.style.display = 'block';
+            activitySection.innerHTML = '';
+            
+            switch(activityType) {
+                case 'Affirmation':
+                    createAffirmationActivity(activitySection);
+                    break;
+                case 'Guess the Number':
+                    createGuessNumberActivity(activitySection);
+                    break;
+                case 'Journaling':
+                    createJournalingActivity(activitySection);
+                    break;
+                case 'Word Scramble':
+                    createWordScrambleActivity(activitySection);
+                    break;
+                case 'Coloring':
+                    createColoringActivity(activitySection);
+                    break;
+                case 'Mindful Maze':
+                    createMindfulMazeActivity(activitySection);
+                    break;
+                default:
+                    activitySection.innerHTML = '<p class="text-center text-gray-600">Activity coming soon!</p>';
+            }
+            
+            // Add back button
+            const backButton = document.createElement('button');
+            backButton.className = 'mb-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors';
+            backButton.innerHTML = '<i class="fas fa-arrow-left mr-2"></i>Back to Wheel';
+            backButton.onclick = function() {
+                activitySection.style.display = 'none';
+                activitySection.innerHTML = '';
+                wheelSection.style.display = 'block';
+            };
+            activitySection.appendChild(backButton);
+        }
+
+        function createAffirmationActivity(container) {
+            const affirmations = [
+                "I am worthy of love and respect",
+                "I choose to be kind to myself today",
+                "I am enough just as I am",
+                "I embrace my imperfections with compassion",
+                "I deserve happiness and peace",
+                "I am growing and learning every day"
+            ];
+            
+            const randomAffirmation = affirmations[Math.floor(Math.random() * affirmations.length)];
+            
+            const content = `
+                <div class="text-center p-6 bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl">
+                    <i class="fas fa-quote-left text-4xl text-pink-400 mb-4"></i>
+                    <p class="text-2xl font-semibold text-gray-800 mb-6">${randomAffirmation}</p>
+                    <div class="space-y-3">
+                        <button onclick="speakAffirmation('${randomAffirmation}')" class="px-6 py-3 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors">
+                            <i class="fas fa-volume-up mr-2"></i>Listen
+                        </button>
+                        <button onclick="shareAffirmation('${randomAffirmation}')" class="px-6 py-3 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-colors">
+                            <i class="fas fa-share mr-2"></i>Share
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML += content;
+        }
+
+        function createGuessNumberActivity(container) {
+            const targetNumber = Math.floor(Math.random() * 100) + 1;
+            let attempts = 0;
+            
+            const content = `
+                <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Guess the Number</h3>
+                    <p class="text-gray-600 mb-6">I'm thinking of a number between 1 and 100. Can you guess it?</p>
+                    
+                    <div class="max-w-md mx-auto space-y-4">
+                        <input type="number" id="guess-input" min="1" max="100" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your guess">
+                        <button onclick="checkGuess(${targetNumber})" class="px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
+                            Check Guess
+                        </button>
+                        <p id="guess-feedback" class="text-lg font-semibold"></p>
+                        <p id="attempts-counter" class="text-sm text-gray-600">Attempts: 0</p>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML += content;
+            
+            // Add global functions for this activity
+            window.checkGuess = function(target) {
+                const input = document.getElementById('guess-input');
+                const feedback = document.getElementById('guess-feedback');
+                const attempts = document.getElementById('attempts-counter');
+                
+                const guess = parseInt(input.value);
+                attempts.textContent = `Attempts: ${++window.attempts || 1}`;
+                window.attempts = window.attempts || 1;
+                
+                if (isNaN(guess)) {
+                    feedback.textContent = 'Please enter a valid number';
+                    feedback.className = 'text-lg font-semibold text-red-500';
+                    return;
+                }
+                
+                if (guess === target) {
+                    feedback.textContent = '🎉 Congratulations! You guessed it!';
+                    feedback.className = 'text-lg font-semibold text-green-500';
+                    input.disabled = true;
+                } else if (guess < target) {
+                    feedback.textContent = '📈 Try a higher number';
+                    feedback.className = 'text-lg font-semibold text-blue-500';
+                } else {
+                    feedback.textContent = '📉 Try a lower number';
+                    feedback.className = 'text-lg font-semibold text-blue-500';
+                }
+                
+                input.value = '';
+                input.focus();
+            };
+        }
+
+        function createJournalingActivity(container) {
+            const prompts = [
+                "What are three things you're grateful for today?",
+                "What would you tell your younger self?",
+                "What does self-compassion mean to you?",
+                "Describe a recent challenge and how you overcame it",
+                "What makes you feel most alive and joyful?",
+                "Write about a time you showed yourself kindness"
+            ];
+            
+            const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+            
+            const content = `
+                <div class="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Journaling Prompt</h3>
+                    <p class="text-lg text-gray-700 mb-6 text-center">${randomPrompt}</p>
+                    
+                    <textarea id="journal-entry" class="w-full h-48 p-4 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Start writing your thoughts here..."></textarea>
+                    
+                    <div class="flex justify-center mt-6 space-x-4">
+                        <button onclick="saveJournalEntry()" class="px-6 py-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors">
+                            <i class="fas fa-save mr-2"></i>Save
+                        </button>
+                        <button onclick="clearJournalEntry()" class="px-6 py-3 bg-gray-500 text-white rounded-full hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>Clear
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML += content;
+            
+            // Add global functions
+            window.saveJournalEntry = function() {
+                const entry = document.getElementById('journal-entry').value;
+                if (entry.trim()) {
+                    alert('Journal entry saved! 📝\n\n' + entry);
+                    document.getElementById('journal-entry').value = '';
+                } else {
+                    alert('Please write something before saving.');
+                }
+            };
+            
+            window.clearJournalEntry = function() {
+                if (confirm('Are you sure you want to clear your journal entry?')) {
+                    document.getElementById('journal-entry').value = '';
+                }
+            };
+        }
+
+        function closeModal() {
+            document.getElementById('emotion-modal').classList.remove('active');
+        }
+
+        // Placeholder functions for other activities
+        function createWordScrambleActivity(container) {
+            container.innerHTML = `
+                <div class="text-center p-6 bg-orange-50 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Word Scramble</h3>
+                    <p class="text-gray-600">Coming soon! This activity will help you unscramble positive words.</p>
+                </div>
+            `;
+        }
+
+        function createColoringActivity(container) {
+            container.innerHTML = `
+                <div class="text-center p-6 bg-purple-50 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Coloring Activity</h3>
+                    <p class="text-gray-600">Coming soon! Relax with beautiful coloring pages.</p>
+                </div>
+            `;
+        }
+
+        function createMindfulMazeActivity(container) {
+            container.innerHTML = `
+                <div class="text-center p-6 bg-indigo-50 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Mindful Maze</h3>
+                    <p class="text-gray-600">Coming soon! Navigate through calming mazes.</p>
+                </div>
+            `;
+        }
+
+        // Utility functions
+        function speakAffirmation(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.1;
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('Text-to-speech is not supported in your browser');
+            }
+        }
+
+        function shareAffirmation(text) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Daily Affirmation',
+                    text: text,
+                    url: window.location.href
+                });
+            } else {
+                alert('Share feature not available. Copy this: ' + text);
+            }
+        }
+    </script>
+</body>
+</html>
+

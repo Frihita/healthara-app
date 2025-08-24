@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'physical': '#be185d',
+                        'mental': '#4f46e5',
+                        'glass-light': 'rgba(255, 255, 255, 0.7)',
+                        'glass-dark': 'rgba(30, 41, 59, 0.4)'
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg {
+            background-image: radial-gradient(ellipse at top left, var(--tw-gradient-stops));
+            --tw-gradient-from: #d1fae5;
+            --tw-gradient-to: #e0f2fe;
+            --tw-gradient-via: #fff;
+        }
+        .dark .gradient-bg {
+            --tw-gradient-from: #0f172a;
+            --tw-gradient-to: #1e1b4b;
+            --tw-gradient-via: #020617;
+        }
+        .glass {
+            backdrop-filter: blur(16px);
+            background-color: var(--tw-colors-glass-light);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+        }
+        .dark .glass {
+            background-color: var(--tw-colors-glass-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 min-h-svh">
+
+    <div id="auth-screen" class="min-h-svh grid place-items-center p-6">
+        <div class="fixed inset-0 -z-10 gradient-bg"></div>
+        <div class="glass w-full max-w-lg p-6 sm:p-8 animate-fade-in">
+            <div class="p-0">
+                <h2 class="text-2xl flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-emerald-600">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" x2="3" y1="12" y2="12"></line>
+                    </svg>
+                    Login or Sign Up
+                </h2>
+                <p class="text-sm text-slate-500 mt-1">Your AI-powered wellness companion</p>
+            </div>
+            <div class="pt-6 grid gap-4">
+                <div class="grid gap-2">
+                    <label class="text-sm font-medium">Email</label>
+                    <input type="email" id="email-input" placeholder="you@example.com" class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-800" />
+                </div>
+                <div class="grid gap-2">
+                    <label class="text-sm font-medium">Password</label>
+                    <input type="password" id="password-input" placeholder="••••••••" class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-800" />
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button id="login-btn" class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:focus-visible:ring-slate-300 h-10 px-4 py-2 bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-1">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                        Login
+                    </button>
+                    <button id="signup-btn" class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:focus-visible:ring-slate-300 h-10 px-4 py-2 border border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50">
+                        or Sign Up
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-btn').addEventListener('click', () => {
+            // Simulate login success
+            alert('Login successful! Redirecting to home page.');
+            window.location.href = 'home.html';
+        });
+
+        document.getElementById('signup-btn').addEventListener('click', () => {
+            // Simulate signup success
+            alert('Sign up successful! Redirecting to home page.');
+            window.location.href = 'home.html';
+        });
+    </script>
+</body>
+</html>

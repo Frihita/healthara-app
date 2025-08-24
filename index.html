@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Healthara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'glass-light': 'rgba(255, 255, 255, 0.7)',
+                        'glass-dark': 'rgba(30, 41, 59, 0.4)'
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg {
+            background-image: radial-gradient(ellipse at top left, var(--tw-gradient-stops));
+            --tw-gradient-from: #d1fae5;
+            --tw-gradient-to: #e0f2fe;
+            --tw-gradient-via: #fff;
+        }
+        .dark .gradient-bg {
+            --tw-gradient-from: #0f172a;
+            --tw-gradient-to: #1e1b4b;
+            --tw-gradient-via: #020617;
+        }
+        .glass {
+            backdrop-filter: blur(16px);
+            background-color: var(--tw-colors-glass-light);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+        }
+        .dark .glass {
+            background-color: var(--tw-colors-glass-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 min-h-svh">
+
+    <div id="splash-screen" class="min-h-svh grid place-items-center p-6 transition-opacity duration-1000 ease-out">
+        <div class="fixed inset-0 -z-10 gradient-bg"></div>
+        <div class="glass max-w-3xl w-full p-8 sm:p-10 text-center animate-fade-in">
+            <h1 class="text-3xl sm:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-indigo-600">
+                Welcome to Healthara
+            </h1>
+            <p class="mt-3 text-slate-600 dark:text-slate-300">Your AI-powered wellness companion</p>
+            <div class="mt-8 flex justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-8 w-8 spin text-emerald-600">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                </svg>
+            </div>
+            <p class="mt-4 text-sm text-slate-500">Calibrating your wellness universe… (Auto-redirects in 3 seconds)</p>
+        </div>
+    </div>
+
+    <script>
+        // Redirect to the login/signup page after 3 seconds
+        setTimeout(() => {
+            window.location.href = 'sign.html';
+        }, 3000); // 3000 milliseconds = 3 seconds
+    </script>
+</body>
+</html>

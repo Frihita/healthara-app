@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthara - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'physical': '#be185d',
+                        'mental': '#4f46e5',
+                        'glass-light': 'rgba(255, 255, 255, 0.7)',
+                        'glass-dark': 'rgba(30, 41, 59, 0.4)'
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg {
+            background-image: radial-gradient(ellipse at top left, var(--tw-gradient-stops));
+            --tw-gradient-from: #d1fae5;
+            --tw-gradient-to: #e0f2fe;
+            --tw-gradient-via: #fff;
+        }
+        .dark .gradient-bg {
+            --tw-gradient-from: #0f172a;
+            --tw-gradient-to: #1e1b4b;
+            --tw-gradient-via: #020617;
+        }
+        .glass {
+            backdrop-filter: blur(16px);
+            background-color: var(--tw-colors-glass-light);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+        }
+        .dark .glass {
+            background-color: var(--tw-colors-glass-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .glass-card {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 0.75rem;
+        }
+        .dark .glass-card {
+            background-color: rgba(30, 41, 59, 0.2);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 min-h-svh">
+
+    <div id="home-screen" class="min-h-svh p-4 sm:p-6">
+        <div class="fixed inset-0 -z-10 gradient-bg"></div>
+        <div class="sticky top-0 z-30 flex items-center justify-between p-3 sm:p-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur border-b border-white/30 dark:border-white/10">
+            <div class="flex items-center gap-2 font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-emerald-600">
+                    <path d="M15 10c0 1.1-.9 2-2 2s-2-.9-2-2.1v-2.1c0-1.2.9-2.2 2-2.2s2 1 2 2.2z"></path>
+                    <path d="M22 17s-2.1 2.2-2.3 2.7c-1.3 2.3-3.8 2.3-5.1 0-1.8-3.1-4.8-2.9-6.3-5.5-.9-1.5-.7-3.2 0-4.6 1.1-2.1 3.5-3.3 5.4-3.3 2 0 4.1 1.2 5.2 3.3.4.8.7 1.7.7 2.6-.1.9-.3 1.8-.7 2.6z"></path>
+                    <path d="M12 21a2 2 0 0 0 2-2c0-1.1-.9-2-2-2s-2 .9-2 2a2 2 0 0 0 2 2z"></path>
+                </svg>
+                <span>Healthara</span>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button id="theme-toggle" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:focus-visible:ring-slate-300 h-10 px-4 py-2 border border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-1">
+                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"></path>
+                    </svg>
+                    Toggle
+                </button>
+                <!-- Language Switch Placeholder -->
+                <button id="language-switch" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:focus-visible:ring-slate-300 h-10 px-4 py-2 border border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-1">
+                        <path d="M12 22c4.667 0 8-2 8-6s-3.333-6-8-6-8 2-8 6 3.333 6 8 6z"></path>
+                        <path d="M12 16a4 4 0 0 0-4 4"></path>
+                        <path d="M12 16a4 4 0 0 1 4 4"></path>
+                        <path d="M12 16v-4"></path>
+                        <path d="M12 12a4 4 0 0 0-4-4"></path>
+                        <path d="M12 12a4 4 0 0 1 4-4"></path>
+                        <path d="M12 12v-4"></path>
+                    </svg>
+                    Lang
+                </button>
+            </div>
+        </div>
+        <div class="max-w-6xl mx-auto mt-4 grid gap-4 sm:gap-6 animate-fade-in">
+            <div class="glass p-6 sm:p-8">
+                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold">Hello, Friend!</h2>
+                        <p class="text-slate-600 dark:text-slate-300">Which health do you want to work on?</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                    <div id="physical-card" class="glass-card p-6 rounded-xl shadow-sm hover:shadow-2xl transition-shadow cursor-pointer">
+                        <div class="flex flex-col space-y-1.5">
+                            <h3 class="font-semibold whitespace-nowrap tracking-tight text-xl flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-physical">
+                                    <path d="M19.5 10.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"></path>
+                                    <path d="M16 16s2.5 3.5 6 5.5"></path>
+                                    <path d="M10 13a7 7 0 0 0 6.6 8.5"></path>
+                                    <path d="M14 20a1.5 1.5 0 0 1-3 0c-.8-1-2-2.5-2.5-3.5L4 10.5s3.5-4 7-4 7 4 7 4L14 17.5c-.5 1-1.7 2.5-2.5 3.5z"></path>
+                                    <path d="M9 14.5s1.2 1.3 1.5 1.7"></path>
+                                    <path d="M13.5 13s1.7 2 2 2.5"></path>
+                                    <path d="M16.5 7.5c1.8 1.5 3.3 4 3.5 5.5"></path>
+                                    <path d="M12 17.5s2.5 2 4.5 3"></path>
+                                </svg>
+                                Physical Health
+                            </h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">Targeted relief, circadian guidance, smart nutrition, and calorie budgeting—all in one place.</p>
+                        </div>
+                        <div class="p-6 pt-0">
+                            <img alt="physical health" src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1600&auto=format&fit=crop" class="rounded-xl w-full h-44 object-cover mt-4"/>
+                        </div>
+                    </div>
+                    <div id="mental-card" class="glass-card p-6 rounded-xl shadow-sm hover:shadow-2xl transition-shadow cursor-pointer">
+                        <div class="flex flex-col space-y-1.5">
+                            <h3 class="font-semibold whitespace-nowrap tracking-tight text-xl flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-mental">
+                                    <path d="M15 15.5c-3.5 1.5-6 .5-7.5-3-2-4.5-5-6.5-7-7"></path>
+                                    <path d="M19 12a7 7 0 1 0 0 8a7 7 0 0 0 0-8z"></path>
+                                    <path d="M18 13.5c-1.5 1-3.5-.5-5-2-1.5-1.5-3.5-2-5-2-1.5-.5-3 .5-4 1"></path>
+                                </svg>
+                                Mental Health
+                            </h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">Grow calm, playfully. Breathe, release, and build lasting compassion.</p>
+                        </div>
+                        <div class="p-6 pt-0">
+                            <img alt="mental health" src="https://images.unsplash.com/photo-1527236438218-d82077ae1f85?q=80&w=1600&auto=format&fit=crop" class="rounded-xl w-full h-44 object-cover mt-4"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Theme toggle functionality
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        // Navigation to physical and mental health dashboards
+        document.getElementById('physical-card').addEventListener('click', () => {
+            window.location.href = 'physical_health.html';
+        });
+        document.getElementById('mental-card').addEventListener('click', () => {
+            window.location.href = 'mentalhealth.html';
+        });
+
+        // Placeholder for language switch functionality
+        document.getElementById('language-switch').addEventListener('click', () => {
+            alert('Language switch functionality would be implemented here!');
+            // In a real app, this would trigger a function to change the app's language
+            // e.g., by loading different text content or using a translation library.
+        });
+    </script>
+</body>
+</html>
